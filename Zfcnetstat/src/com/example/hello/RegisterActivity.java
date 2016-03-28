@@ -107,6 +107,8 @@ public class RegisterActivity extends Activity implements OnClickListener{
 			String[] s = new String[4];		
 			try {
 				s[0] = URLEncoder.encode(mobilenum, "UTF-8");
+				//产生32位小写的，类似这样的，比如2的profile.getMD5(2)得到
+				//c81e728d9d4c2f636f067f89cc14862c
 				s[1] = URLEncoder.encode(profile.getMD5(pwd1), "UTF-8");
 				s[2] = URLEncoder.encode(realname, "UTF-8");
 				s[3] = URLEncoder.encode(stuid, "UTF-8");

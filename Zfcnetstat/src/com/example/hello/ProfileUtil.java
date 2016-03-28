@@ -107,6 +107,8 @@ public class ProfileUtil {
 			return Long.parseLong(tmp);
 	}
 	//md5加密
+	//产生32位小写的，类似这样的，比如2的getMD5(2)得到
+	//c81e728d9d4c2f636f067f89cc14862c
 	public String getMD5(String info)
 	{
 	  try

@@ -82,20 +82,21 @@ public class MainActivity extends Activity implements OnClickListener{
             	login(mobilenum,pwd);
             	profile.writeParam("username",mobilenum);
             	profile.writeParam("stuid",pwd);
+            	
             }
             
-			if (!isServiceStarted) {			
-				Intent intent = new Intent(this, MyService.class);		     
-			    if (startService(intent) == null) {
-			    	Toast.makeText(getApplicationContext(), "无法启动！" ,Toast.LENGTH_SHORT).show();
-			    	return;
-			    }
-			    isServiceStarted = true;
-			    //
-			}else{
-				Toast.makeText(getApplicationContext(), "服务已启动！" ,Toast.LENGTH_SHORT).show();
-				return;
-			}
+//			if (!isServiceStarted) {			
+//				Intent intent = new Intent(this, MyService.class);		     
+//			    if (startService(intent) == null) {
+//			    	Toast.makeText(getApplicationContext(), "无法启动！" ,Toast.LENGTH_SHORT).show();
+//			    	return;
+//			    }
+//			    isServiceStarted = true;
+//			    //
+//			}else{
+//				Toast.makeText(getApplicationContext(), "服务已启动！" ,Toast.LENGTH_SHORT).show();
+//				return;
+//			}
 			break;
 		case R.id.buttonregister:
 			Intent intent = new Intent(); 

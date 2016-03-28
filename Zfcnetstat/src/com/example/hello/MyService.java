@@ -80,8 +80,8 @@ public class MyService extends Service {
 						Long l = System.currentTimeMillis();
 						profile.writeTime(l,"starttime");
 						Toast.makeText(getApplicationContext(), info.getTypeName(),Toast.LENGTH_SHORT).show();
-						//将之前的上网时间数值上传网站（仅在WIFI情况下）
-						if(info.getType() == ConnectivityManager.TYPE_MOBILE){
+						//将之前的上网时间数值上传网站（在WIFI或者MOBILE情况下）
+						if(info.getType() == ConnectivityManager.TYPE_MOBILE||info.getType() == ConnectivityManager.TYPE_WIFI){
 							connectNodejsServer();
 						}
 					}

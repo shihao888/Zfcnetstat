@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="用户名（手机号）*唯一标识"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <EditText
+        android:id="@+id/reg_mobilenum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="phone" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="密码"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <EditText
+        android:id="@+id/pwd1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="再输入一次密码"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <EditText
+        android:id="@+id/pwd2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="真实姓名"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <EditText
+        android:id="@+id/realname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="学号"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <EditText
+        android:id="@+id/stuid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number" />
+ <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal"
+        android:id="@+id/code"
+         >
+
+        <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="10dp"
+          android:layout_marginLeft="10dp"
+          android:layout_marginRight="10dp"
+          android:layout_marginTop="5dp"
+          android:orientation="horizontal" >
+<TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:text="验 证 码:"
+            android:textColor="#000000" />
+
+          <EditText
+              android:id="@+id/vc_code"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:background="#0000"
+              android:maxLength="4"
+              android:paddingBottom="10dp"
+              android:paddingEnd="10dp"
+              android:paddingLeft="10dp"
+              android:paddingStart="10dp"
+              android:paddingTop="10dp"
+              android:textColor="#000000"
+              android:textSize="14sp"
+              android:hint="abcd"
+              android:visibility="visible" />
+
+        </LinearLayout>
+
+        <ImageView
+          android:id="@+id/vc_image"
+          android:contentDescription="验证码"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_marginBottom="10dp"
+          android:layout_marginTop="5dp"
+          android:layout_weight="1" />
+
+        <Button
+          android:id="@+id/vc_shuaxin"
+          android:layout_width="40dp"
+          android:layout_height="wrap_content"
+          android:background="@android:color/transparent"
+          android:layout_gravity="center_vertical"
+          android:text="刷新验证码"
+          android:textStyle="italic"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="10dp"
+          android:layout_marginLeft="5dp"
+          android:layout_marginRight="5dp"
+          android:textColor="#7f7f7f"
+          android:textSize="12sp" />
+      </LinearLayout>
+    <Button
+        android:id="@+id/registerOK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="提交注册" />
+
+    <Button
+        android:id="@+id/registerCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="暂不注册" />
+
+</LinearLayout>

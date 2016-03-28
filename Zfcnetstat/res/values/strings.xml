@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">上网时长统计</string>
+    <string name="hello_world">浙江金融职业学院上网时长调查，本程序将会在后台运行，不会传播您任何隐私信息，也不会带来任何额外数据（MOBILE DATA）流量，检测上网时长的数据只利用WIFI传递和搜集。</string>
+    <string name="action_settings">关于...</string>
+    <string name="action_chkmyservice">查看后台服务是否运行</string>
+    <string name="action_cleartotal">上网时长清零</string>
+    <string name="buttonstart_text">同意参与调查并开始</string>
+    <string name="StartServiceActivityStr">启动服务</string>
+	<string name="config_filename">spconfig</string>
+	<string name="buttonlogin">手机号登录</string>
+	<string name="buttonregister">注册新用户</string>
+	<string name="stopservice">停止服务</string>
+</resources>

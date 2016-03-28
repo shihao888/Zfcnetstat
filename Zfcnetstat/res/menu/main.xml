@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.hello.MainActivity" >
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/>
+    <item android:id="@+id/chkmyservice" android:title="@string/action_chkmyservice"></item>
+	<item android:id="@+id/cleartotal" android:title="@string/action_cleartotal"></item>
+	<item android:id="@+id/stopservice" android:title="@string/stopservice"></item>
+</menu>

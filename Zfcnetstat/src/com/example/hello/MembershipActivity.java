@@ -1,57 +1,71 @@
 package com.example.hello;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MembershipActivity extends Activity implements OnClickListener{
 	Button buttonStartService;
 	private ProfileUtil profile;
 	boolean isServiceStarted = false;
+	TextView tvOnlineInfo;	
+	MyReceiver receiver;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_membership);
 		profile = new ProfileUtil(this);
-		
+		//显示上网时间
+		tvOnlineInfo = (TextView) findViewById(R.id.OnlineInfo);
+		//注册接收器
+		receiver=new MyReceiver();
+		IntentFilter filter=new IntentFilter();
+		filter.addAction("android.intent.action.OnlineTimeUpdate");
+		this.registerReceiver(receiver,filter);
 		//开启
 		buttonStartService = (Button) findViewById(R.id.StartService); 	 
 		buttonStartService.setOnClickListener(this);  
 		
 	}
-
+	
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.StartService:
 			
-			if (!isServiceStarted) {			
-			Intent intent = new Intent(this, MyService.class);		     
-		    if (startService(intent) == null) {
-		    	Toast.makeText(getApplicationContext(), "无法启动！" ,Toast.LENGTH_SHORT).show();
-		    	return;
-		    }
-		    isServiceStarted = true;
-		    //
-		}else{
-			Toast.makeText(getApplicationContext(), "服务已启动！" ,Toast.LENGTH_SHORT).show();
-			return;
-		}
-			
+			if (!isServiceStarted) {
+				Intent intent = new Intent(this, MyService.class);
+				if (startService(intent) == null) {
+					Toast.makeText(getApplicationContext(), "无法启动！", Toast.LENGTH_SHORT).show();
+					return;
+				}
+				isServiceStarted = true;
+				//
+			} else {
+				Toast.makeText(getApplicationContext(), "服务已启动！", Toast.LENGTH_SHORT).show();
+				return;
+			}			
 			
 			break;
 		}
@@ -61,7 +75,7 @@ public class MembershipActivity extends Activity implements OnClickListener{
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.member, menu);
 		return true;
 	}
 
@@ -120,13 +134,27 @@ public class MembershipActivity extends Activity implements OnClickListener{
 	    }
 	    return false;
 	}
-	public static String formatDuring(long mss) {  
-	    long days = mss / (1000 * 60 * 60 * 24);  
-	    long hours = (mss % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);  
-	    long minutes = (mss % (1000 * 60 * 60)) / (1000 * 60);  
-	    long seconds = (mss % (1000 * 60)) / 1000;  
-	    return days + " days " + hours + " hours " + minutes + " minutes "  
-	            + seconds + " seconds ";  
+	public static String formatDuring(long mss) {  	      
+	    java.text.DecimalFormat   df=new   java.text.DecimalFormat("#.##"); 		
+		float f = (float)mss/(float)(1000 * 60 * 60);			     
+	    return df.format(f) +" 小时 " ;  
 	} 
+	//自定义一个广播接收器
+	public class MyReceiver extends BroadcastReceiver {
 
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			// TODO Auto-generated method stub
+			Bundle bundle=intent.getExtras();
+			long a=bundle.getLong("totaltime");
+			tvOnlineInfo.setText(formatDuring(a));
+		}
+		
+	}
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		this.unregisterReceiver(receiver);
+	}
 }

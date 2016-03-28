@@ -27,7 +27,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity implements OnClickListener{
 	Button buttonLogin, buttonRegister; 	 
 	EditText et_mobilenum,et_pwd;
-	String userid;
+	String mobilenum,pwd;
 	
 	private ProfileUtil profile;
 	@Override
@@ -43,12 +43,8 @@ public class MainActivity extends Activity implements OnClickListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-		
-		profile = new ProfileUtil(this);
-		userid=profile.readParam("userid");
-				
+		setContentView(R.layout.activity_main);		
+		profile = new ProfileUtil(this);					
 		
 		// 通过 findViewById(id)方法获取用户名和密码控件对象  
 		et_mobilenum = (EditText) findViewById(R.id.et_mobilenum);  
@@ -71,21 +67,16 @@ public class MainActivity extends Activity implements OnClickListener{
 		switch (src.getId()) {
 		case R.id.buttonlogin:
 			// 获取用户手机号  
-            final String mobilenum = et_mobilenum.getText().toString();  
+            mobilenum = et_mobilenum.getText().toString();  
             // 获取用户密码
-            final String pwd = et_pwd.getText().toString(); 
+            pwd = et_pwd.getText().toString(); 
             
             if (TextUtils.isEmpty(mobilenum) || TextUtils.isEmpty(pwd)) {  
                 Toast.makeText(this, "手机号和密码都不能为空,调查服务没有启动！", Toast.LENGTH_LONG).show();
                 return;
             }else{
-            	login(mobilenum,pwd);
-            	profile.writeParam("username",mobilenum);
-            	profile.writeParam("stuid",pwd);
-            	
-            }           
-
-            
+            	login(mobilenum,pwd);       	
+            }                       
 			break;
 		case R.id.buttonregister:
 			Intent intent = new Intent(); 
@@ -136,11 +127,12 @@ public class MainActivity extends Activity implements OnClickListener{
 			Toast.makeText(mActivity.getApplicationContext(), val, Toast.LENGTH_LONG).show();
 			//如果登录成功
 			if(val.equals("OK")){
+			mActivity.profile.writeParam("mobilenum",mActivity.mobilenum);
 			Intent intent = new Intent(); 
 			intent.setClass(mActivity,MembershipActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
 			mActivity.startActivity(intent);
-			mActivity.setTitle("成员用户");
+			mActivity.setTitle("成员用户:"+mActivity.mobilenum);
 			}
         }  
     }  

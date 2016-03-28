@@ -10,6 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -35,7 +37,7 @@ import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 public class MyService extends Service {
-		
+	
 	private ConnectivityManager connectivityManager;  
     private NetworkInfo info;     
     
@@ -82,12 +84,14 @@ public class MyService extends Service {
 						Toast.makeText(getApplicationContext(), info.getTypeName(),Toast.LENGTH_SHORT).show();
 						//将之前的上网时间数值上传网站（在WIFI或者MOBILE情况下）
 						if(info.getType() == ConnectivityManager.TYPE_MOBILE||info.getType() == ConnectivityManager.TYPE_WIFI){
-							connectNodejsServer();
+							
+							timer.schedule(task, 1000, 30000); // 1s后执行task,然后每隔30s连续执行 
 						}
 					}
 					else{
 						Toast.makeText(getApplicationContext(), "没有可用网络",Toast.LENGTH_SHORT).show();
 						//停止计时
+						timer.cancel();
 						long stoptime = System.currentTimeMillis();						
 						long totaltime = profile.readTime("totaltime")+stoptime-profile.readTime("starttime"); 
 						profile.writeTime(totaltime,"totaltime"); //记录总时间
@@ -97,28 +101,7 @@ public class MyService extends Service {
             }  
 		}
 		
-		private void connectNodejsServer() {
-			long totaltime = profile.readTime("totaltime");
-			String s1, s2;
-			try {
-				s1 = URLEncoder.encode(profile.readParam("username"), "UTF-8");
-				s2 = URLEncoder.encode(profile.readParam("stuid"), "UTF-8");
-
-				String site = "http://zfcnetstat.duapp.com/upload";
-				String url = site + "?onlinetime=" + totaltime + "&username=" + s1 + "&stuid=" + s2 + "&devid="
-						+ getDevId();
-
-				// 启动线程更新网站端数据库
-				MyHandler h = new MyHandler(MyService.this); //对外部类对象的引用
-				HttpGetThread httpThread = new HttpGetThread(url, h);
-				new Thread(httpThread).start();
-				
-
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}//end of connectNodejsServer()
+		
 	};
     
 	// http://blog.csdn.net/wuleihenbang/article/details/17126371
@@ -176,7 +159,46 @@ public class MyService extends Service {
 		Toast.makeText(getApplicationContext(), "Service is starting...", Toast.LENGTH_SHORT).show();
 	    return START_STICKY;
 	}
+	//定时器
+	Timer timer = new Timer();  
+    TimerTask task = new TimerTask() {  
+  
+        @Override  
+        public void run() {  
+            // 需要做的事:
+        	// 更新总上网时间,同时更新MembershipActivity界面
+        	//定时连接后台nodejs服务器上传总上网时间  
+        	long stoptime = System.currentTimeMillis();						
+			long totaltime = profile.readTime("totaltime")+stoptime-profile.readTime("starttime"); 
+			profile.writeTime(totaltime,"totaltime"); //记录总时间
+			profile.writeTime(stoptime,"starttime");//记录结束时间到开始位置	
+			//更新MembershipActivity界面
+			Intent intent=new Intent();
+			intent.putExtra("totaltime", String.valueOf(totaltime));
+			intent.setAction("android.intent.action.OnlineTimeUpdate");//action与接收器相同
+			sendBroadcast(intent);
+        	connectNodejsServer(); 
+        }  
+    };  
+    private void connectNodejsServer() {
+		
+		String[] s = new String[2];
+		try {
+			s[0] = URLEncoder.encode(profile.readParam("mobilenum"), "UTF-8");
+			s[1] = URLEncoder.encode(String.valueOf(profile.readTime("totaltime")), "UTF-8");			
+			String site = ProfileUtil.mywebsite+"/upload";
+			String url = site + "?mobilenum="+s[0]+"&onlinetime=" + s[1];
 
+			// 启动线程更新网站端数据库
+			MyHandler h = new MyHandler(MyService.this); //对外部类对象的引用
+			HttpGetThread httpThread = new HttpGetThread(url, h);
+			new Thread(httpThread).start();
+			
 
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}//end of connectNodejsServer()
 	
 }

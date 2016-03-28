@@ -63,7 +63,7 @@ public class MainActivity extends Activity implements OnClickListener{
 
 	}
 	
-	boolean isServiceStarted = false;
+	
 	@Override
 	public void onClick(View src) {
 		// TODO Auto-generated method stub
@@ -83,20 +83,9 @@ public class MainActivity extends Activity implements OnClickListener{
             	profile.writeParam("username",mobilenum);
             	profile.writeParam("stuid",pwd);
             	
-            }
+            }           
+
             
-//			if (!isServiceStarted) {			
-//				Intent intent = new Intent(this, MyService.class);		     
-//			    if (startService(intent) == null) {
-//			    	Toast.makeText(getApplicationContext(), "无法启动！" ,Toast.LENGTH_SHORT).show();
-//			    	return;
-//			    }
-//			    isServiceStarted = true;
-//			    //
-//			}else{
-//				Toast.makeText(getApplicationContext(), "服务已启动！" ,Toast.LENGTH_SHORT).show();
-//				return;
-//			}
 			break;
 		case R.id.buttonregister:
 			Intent intent = new Intent(); 
@@ -108,6 +97,7 @@ public class MainActivity extends Activity implements OnClickListener{
 			
 			
 		}
+		return;
 	}
 	private void login(String mobilenum, String pwd) {
 		String[] s = new String[2];		
@@ -154,15 +144,7 @@ public class MainActivity extends Activity implements OnClickListener{
 			}
         }  
     }  
-	private boolean isServiceRunning(String serviceName) {//"com.example.MyService"
-	    ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-	        if (serviceName.equals(service.service.getClassName())) {
-	            return true;
-	        }
-	    }
-	    return false;
-	}
+
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -184,47 +166,10 @@ public class MainActivity extends Activity implements OnClickListener{
 			builder.create().show();			
 			return true;
 		}
-		if (id == R.id.chkmyservice) {
-			String s = "";
-			if(isServiceRunning("com.example.hello.MyService"))s="后台服务正在运行......";
-			else s="后台服务已经停止!!!";
-			Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-			Long total = profile.readTime("totaltime");
-			Long start = profile.readTime("starttime");
-			Long stop = profile.readTime("stoptime");
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy年-MM月dd日-HH时mm分ss秒");
-			Date date1 = new Date(start);Date date2 = new Date(stop);
-			String sTotal = formatDuring(total);
-			String sStart = formatter.format(date1);
-			String sStop= formatter.format(date2);
-			s="total="+sTotal+" starttime="+sStart+" stoptime="+sStop;
-			AlertDialog.Builder builder=new AlertDialog.Builder(this);  //先得到构造器 
-			builder.setMessage(s);
-			builder.create().show(); 
-			
-			return true;
-		}
-		if (id == R.id.cleartotal) {
-			profile.writeTime(0,"totaltime");
-		}
-		if (id == R.id.stopservice) {
-			if (isServiceStarted) {		
-				stopService(new Intent(this, MyService.class));
-				isServiceStarted = false;
-			}else{
-				Toast.makeText(getApplicationContext(), "服务已停止！" ,Toast.LENGTH_SHORT).show();
-			}
-		}
+		
 		return super.onOptionsItemSelected(item);
 	}
-	public static String formatDuring(long mss) {  
-	    long days = mss / (1000 * 60 * 60 * 24);  
-	    long hours = (mss % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);  
-	    long minutes = (mss % (1000 * 60 * 60)) / (1000 * 60);  
-	    long seconds = (mss % (1000 * 60)) / 1000;  
-	    return days + " days " + hours + " hours " + minutes + " minutes "  
-	            + seconds + " seconds ";  
-	} 
+	
 	
 	
 }

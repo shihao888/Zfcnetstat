@@ -12,4 +12,7 @@
 	<string name="buttonlogin">手机号登录</string>
 	<string name="buttonregister">注册新用户</string>
 	<string name="stopservice">停止服务</string>
+	<string name="membershipWelcome">欢迎成功登录！</string>
+	<string name="membershipStatement">上网调查已经启动！</string>
+	<string name="StartService">启动上网时长统计</string>
 </resources>

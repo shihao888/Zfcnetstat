@@ -25,7 +25,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>            
         </activity>
-        <activity android:name=".RegisterActivity"> </activity> 
+        <activity android:name=".RegisterActivity"> </activity>
+        <activity android:name=".MembershipActivity"> </activity>  
         <service android:enabled="true" android:name=".MyService"/>
         <activity android:name=".StartServiceActivity" android:label="@string/StartServiceActivityStr"></activity>  
     </application>

@@ -126,13 +126,13 @@ public class MainActivity extends Activity implements OnClickListener{
 			String val = data.getString("MyValue");//请求结果
 			Toast.makeText(mActivity.getApplicationContext(), val, Toast.LENGTH_LONG).show();
 			//如果登录成功
-			if(val.equals("OK")){
+			if(val!=null&&val.equals("OK")){
 			mActivity.profile.writeParam("mobilenum",mActivity.mobilenum);
 			Intent intent = new Intent(); 
+			intent.putExtra("membername", mActivity.mobilenum);
 			intent.setClass(mActivity,MembershipActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
-			mActivity.startActivity(intent);
-			mActivity.setTitle("成员用户:"+mActivity.mobilenum);
+			mActivity.startActivity(intent);			
 			}
         }  
     }  

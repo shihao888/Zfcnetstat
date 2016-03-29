@@ -34,6 +34,8 @@ public class MembershipActivity extends Activity implements OnClickListener{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_membership);
+		String membername = getIntent().getStringExtra("membername");
+		this.setTitle("会员："+membername);
 		profile = new ProfileUtil(this);
 		//显示上网时间
 		tvOnlineInfo = (TextView) findViewById(R.id.OnlineInfo);

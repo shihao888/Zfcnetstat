@@ -28,7 +28,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	Button buttonLogin, buttonRegister; 	 
 	EditText et_mobilenum,et_pwd;
 	String mobilenum,pwd;
-	
+	String alreadyLoggedIn;
 	private ProfileUtil profile;
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -44,8 +44,8 @@ public class MainActivity extends Activity implements OnClickListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);		
-		profile = new ProfileUtil(this);					
-		
+		profile = new ProfileUtil(this);
+				
 		// 通过 findViewById(id)方法获取用户名和密码控件对象  
 		et_mobilenum = (EditText) findViewById(R.id.et_mobilenum);  
         et_pwd = (EditText) findViewById(R.id.et_pwd); 
@@ -58,7 +58,16 @@ public class MainActivity extends Activity implements OnClickListener{
         buttonRegister.setOnClickListener(this); 
 
 	}
-	
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		//如果已经登录过
+		alreadyLoggedIn = profile.readParam("loginSuccess");
+		if (alreadyLoggedIn != null && alreadyLoggedIn.equals("OK")) {
+			GotoNextActivity(this, MembershipActivity.class, "mobilenum", profile.readParam("mobilenum"));
+		}
+	}
 	
 	@Override
 	public void onClick(View src) {
@@ -66,11 +75,18 @@ public class MainActivity extends Activity implements OnClickListener{
 				
 		switch (src.getId()) {
 		case R.id.buttonlogin:
-			// 获取用户手机号  
+			
+    		//如果已经登录过
+    		alreadyLoggedIn = profile.readParam("loginSuccess");
+    		if(alreadyLoggedIn!=null&&alreadyLoggedIn.equals("OK")){
+    			GotoNextActivity(this,MembershipActivity.class,"mobilenum",profile.readParam("mobilenum"));
+    			return;
+    		}
+    		
+    		// 获取用户手机号  
             mobilenum = et_mobilenum.getText().toString();  
             // 获取用户密码
             pwd = et_pwd.getText().toString(); 
-            
             if (TextUtils.isEmpty(mobilenum) || TextUtils.isEmpty(pwd)) {  
                 Toast.makeText(this, "手机号和密码都不能为空,调查服务没有启动！", Toast.LENGTH_LONG).show();
                 return;
@@ -79,11 +95,7 @@ public class MainActivity extends Activity implements OnClickListener{
             }                       
 			break;
 		case R.id.buttonregister:
-			Intent intent = new Intent(); 
-			intent.setClass(this,RegisterActivity.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
-			startActivity(intent);
-			setTitle("用户注册");
+			GotoNextActivity(this, RegisterActivity.class, "", "");
 			break;
 			
 			
@@ -128,11 +140,8 @@ public class MainActivity extends Activity implements OnClickListener{
 			//如果登录成功
 			if(val!=null&&val.equals("OK")){
 			mActivity.profile.writeParam("mobilenum",mActivity.mobilenum);
-			Intent intent = new Intent(); 
-			intent.putExtra("membername", mActivity.mobilenum);
-			intent.setClass(mActivity,MembershipActivity.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
-			mActivity.startActivity(intent);			
+			mActivity.profile.writeParam("loginSuccess","OK");			
+			mActivity.GotoNextActivity(mActivity,MembershipActivity.class,"mobilenum",mActivity.mobilenum);
 			}
         }  
     }  
@@ -162,6 +171,14 @@ public class MainActivity extends Activity implements OnClickListener{
 		return super.onOptionsItemSelected(item);
 	}
 	
+	private void GotoNextActivity(Activity FromAct,Class<?> ToActCls,String InfoName, String InfoValue){
+		Intent intent = new Intent(); 
+		intent.putExtra(InfoName, InfoValue);
+		intent.setClass(FromAct,ToActCls);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
+		FromAct.startActivity(intent);
+	}
+
 	
 	
 }

@@ -34,6 +34,7 @@ public class RegisterActivity extends Activity implements OnClickListener{
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_register);
+		setTitle("用户注册");
 		profile = new ProfileUtil(this);
 		
 		buttonOK = (Button) findViewById(R.id.registerOK);  

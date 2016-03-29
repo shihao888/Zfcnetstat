@@ -34,11 +34,12 @@ public class MembershipActivity extends Activity implements OnClickListener{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_membership);
-		String membername = getIntent().getStringExtra("membername");
-		this.setTitle("会员："+membername);
+		String mobilenum = getIntent().getStringExtra("mobilenum");
+		this.setTitle("会员："+mobilenum);
 		profile = new ProfileUtil(this);
 		//显示上网时间
 		tvOnlineInfo = (TextView) findViewById(R.id.OnlineInfo);
+		tvOnlineInfo.setText(formatDuring(profile.readTime("totaltime")));
 		//注册接收器
 		receiver=new MyReceiver();
 		IntentFilter filter=new IntentFilter();
@@ -49,31 +50,46 @@ public class MembershipActivity extends Activity implements OnClickListener{
 		buttonStartService.setOnClickListener(this);  
 		
 	}
-	
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onPostCreate(savedInstanceState);
+		isServiceStarted = isServiceRunning("com.example.hello.MyService");
+		if(isServiceStarted)buttonStartService.setEnabled(false);
+		else startmyservice();
+	}
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		isServiceStarted = isServiceRunning("com.example.hello.MyService");
+		if(isServiceStarted)buttonStartService.setEnabled(false);
+	}
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.StartService:
-			
-			if (!isServiceStarted) {
-				Intent intent = new Intent(this, MyService.class);
-				if (startService(intent) == null) {
-					Toast.makeText(getApplicationContext(), "无法启动！", Toast.LENGTH_SHORT).show();
-					return;
-				}
-				isServiceStarted = true;
-				//
-			} else {
-				Toast.makeText(getApplicationContext(), "服务已启动！", Toast.LENGTH_SHORT).show();
-				return;
-			}			
-			
+			startmyservice();			
 			break;
 		}
 		
 	}
-
+	private void startmyservice(){
+		if (!isServiceStarted) {
+			Intent intent = new Intent(this, MyService.class);
+			if (startService(intent) == null) {
+				Toast.makeText(getApplicationContext(), "无法启动！", Toast.LENGTH_SHORT).show();
+				return;
+			}
+			isServiceStarted = true;
+			buttonStartService.setEnabled(false);
+			
+		} else {
+			Toast.makeText(getApplicationContext(), "服务已启动！", Toast.LENGTH_SHORT).show();
+			return;
+		}
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -159,4 +175,7 @@ public class MembershipActivity extends Activity implements OnClickListener{
 		super.onDestroy();
 		this.unregisterReceiver(receiver);
 	}
+	
+
+	
 }

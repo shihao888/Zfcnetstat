@@ -85,7 +85,7 @@ public class MyService extends Service {
 						//将之前的上网时间数值上传网站（在WIFI或者MOBILE情况下）
 						if(info.getType() == ConnectivityManager.TYPE_MOBILE||info.getType() == ConnectivityManager.TYPE_WIFI){
 							
-							timer.schedule(task, 1000, 30000); // 1s后执行task,然后每隔30s连续执行 
+							timer.schedule(task, 1000, 60000); // 1s后执行task,然后每隔60s连续执行 
 						}
 					}
 					else{
@@ -174,7 +174,9 @@ public class MyService extends Service {
 			profile.writeTime(stoptime,"starttime");//记录结束时间到开始位置	
 			//更新MembershipActivity界面
 			Intent intent=new Intent();
-			intent.putExtra("totaltime", String.valueOf(totaltime));
+			Bundle bundle = new Bundle();			
+			bundle.putLong("totaltime", totaltime);
+			intent.putExtras(bundle);
 			intent.setAction("android.intent.action.OnlineTimeUpdate");//action与接收器相同
 			sendBroadcast(intent);
         	connectNodejsServer(); 
@@ -190,7 +192,10 @@ public class MyService extends Service {
 			String url = site + "?mobilenum="+s[0]+"&onlinetime=" + s[1];
 
 			// 启动线程更新网站端数据库
-			MyHandler h = new MyHandler(MyService.this); //对外部类对象的引用
+			//Looper.prepare();
+			
+			Looper.getMainLooper();
+			MyHandler h = new MyHandler(MyService.this); //对外部类对象的引用	
 			HttpGetThread httpThread = new HttpGetThread(url, h);
 			new Thread(httpThread).start();
 			

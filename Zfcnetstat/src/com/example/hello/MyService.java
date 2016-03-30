@@ -194,6 +194,7 @@ public class MyService extends Service {
 			String url = site + "?mobilenum="+s[0]+"&onlinetime=" + s[1];
 
 			// 启动线程更新网站端数据库
+			//让需要sendMessage的线程知道用哪个handler往哪个Looper发消息
 			MyHandler h = new MyHandler(Looper.getMainLooper(),MyService.this); //对外部类对象的引用	
 			HttpGetThread httpThread = new HttpGetThread(url, h);
 			new Thread(httpThread).start();

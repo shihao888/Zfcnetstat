@@ -107,10 +107,12 @@ public class MyService extends Service {
 	// http://blog.csdn.net/wuleihenbang/article/details/17126371
 	// http://blog.csdn.net/aigochina/article/details/17841999
 	private static class MyHandler extends Handler {
+		
 		private final MyService mService;
-
-		public MyHandler(MyService s) {
-			mService = new WeakReference<MyService>(s).get();
+		
+		public MyHandler(Looper looper, MyService s) {
+			super(looper);			
+			this.mService = new WeakReference<MyService>(s).get();
 		}
 
 		@Override
@@ -192,10 +194,7 @@ public class MyService extends Service {
 			String url = site + "?mobilenum="+s[0]+"&onlinetime=" + s[1];
 
 			// 启动线程更新网站端数据库
-			//Looper.prepare();
-			
-			Looper.getMainLooper();
-			MyHandler h = new MyHandler(MyService.this); //对外部类对象的引用	
+			MyHandler h = new MyHandler(Looper.getMainLooper(),MyService.this); //对外部类对象的引用	
 			HttpGetThread httpThread = new HttpGetThread(url, h);
 			new Thread(httpThread).start();
 			Looper.loop();

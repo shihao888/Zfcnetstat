@@ -197,7 +197,7 @@ public class MyService extends Service {
 			MyHandler h = new MyHandler(Looper.getMainLooper(),MyService.this); //对外部类对象的引用	
 			HttpGetThread httpThread = new HttpGetThread(url, h);
 			new Thread(httpThread).start();
-			Looper.loop();
+			
 
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block

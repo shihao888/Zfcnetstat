@@ -58,16 +58,7 @@ public class MainActivity extends Activity implements OnClickListener{
         buttonRegister.setOnClickListener(this); 
 
 	}
-	@Override
-	protected void onStart() {
-		// TODO Auto-generated method stub
-		super.onStart();
-		//如果已经登录过
-		alreadyLoggedIn = profile.readParam("loginSuccess");
-		if (alreadyLoggedIn != null && alreadyLoggedIn.equals("OK")) {
-			GotoNextActivity(this, MembershipActivity.class, "mobilenum", profile.readParam("mobilenum"));
-		}
-	}
+	
 	
 	@Override
 	public void onClick(View src) {
@@ -75,14 +66,7 @@ public class MainActivity extends Activity implements OnClickListener{
 				
 		switch (src.getId()) {
 		case R.id.buttonlogin:
-			
-    		//如果已经登录过
-    		alreadyLoggedIn = profile.readParam("loginSuccess");
-    		if(alreadyLoggedIn!=null&&alreadyLoggedIn.equals("OK")){
-    			GotoNextActivity(this,MembershipActivity.class,"mobilenum",profile.readParam("mobilenum"));
-    			return;
-    		}
-    		
+			    		
     		// 获取用户手机号  
             mobilenum = et_mobilenum.getText().toString();  
             // 获取用户密码

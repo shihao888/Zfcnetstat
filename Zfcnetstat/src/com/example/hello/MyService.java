@@ -84,14 +84,16 @@ public class MyService extends Service {
 						Toast.makeText(getApplicationContext(), info.getTypeName(),Toast.LENGTH_SHORT).show();
 						//将之前的上网时间数值上传网站（在WIFI或者MOBILE情况下）
 						if(info.getType() == ConnectivityManager.TYPE_MOBILE||info.getType() == ConnectivityManager.TYPE_WIFI){
-							
-							timer.schedule(task, 1000, 60000); // 1s后执行task,然后每隔60s连续执行 
+							if(timer!=null&&task!=null){
+								timer.cancel();
+								timer.schedule(task, 1000, 60000); // 1s后执行task,然后每隔60s连续执行 
+							}
 						}
 					}
 					else{
 						Toast.makeText(getApplicationContext(), "没有可用网络",Toast.LENGTH_SHORT).show();
 						//停止计时
-						timer.cancel();
+						if(timer!=null)timer.cancel();
 						long stoptime = System.currentTimeMillis();						
 						long totaltime = profile.readTime("totaltime")+stoptime-profile.readTime("starttime"); 
 						profile.writeTime(totaltime,"totaltime"); //记录总时间
@@ -155,6 +157,11 @@ public class MyService extends Service {
 		unregisterReceiver(mReceiver); // 删除广播
 		
 		stopForeground(true); 
+
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
 	}
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {

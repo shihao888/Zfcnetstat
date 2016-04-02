@@ -95,31 +95,24 @@ public class MembershipActivity extends Activity implements OnClickListener{
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			String s="版本version 6 \n"+"用户id:"+profile.readParam("userid");
-			AlertDialog.Builder builder=new AlertDialog.Builder(this);  //先得到构造器 
-			builder.setMessage(s);
-			builder.create().show();			
-			return true;
-		}
+		int id = item.getItemId();		
 		if (id == R.id.chkmyservice) {
 			String s = "";
 			if(isServiceRunning("com.example.hello.MyService"))s="后台服务正在运行......";
 			else s="后台服务已经停止!!!";
 			Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-			Long total = profile.readTime("totaltime");
-			Long start = profile.readTime("starttime");
-			Long stop = profile.readTime("stoptime");
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy年-MM月dd日-HH时mm分ss秒");
-			Date date1 = new Date(start);Date date2 = new Date(stop);
-			String sTotal = formatDuring(total);
-			String sStart = formatter.format(date1);
-			String sStop= formatter.format(date2);
-			s="total="+sTotal+" starttime="+sStart+" stoptime="+sStop;
-			AlertDialog.Builder builder=new AlertDialog.Builder(this);  //先得到构造器 
-			builder.setMessage(s);
-			builder.create().show(); 
+//			Long total = profile.readTime("totaltime");
+//			Long start = profile.readTime("starttime");
+//			Long stop = profile.readTime("stoptime");
+//			SimpleDateFormat formatter = new SimpleDateFormat("yyyy年-MM月dd日-HH时mm分ss秒");
+//			Date date1 = new Date(start);Date date2 = new Date(stop);
+//			String sTotal = formatDuring(total);
+//			String sStart = formatter.format(date1);
+//			String sStop= formatter.format(date2);
+//			s="total="+sTotal+" starttime="+sStart+" stoptime="+sStop;
+//			AlertDialog.Builder builder=new AlertDialog.Builder(this);  //先得到构造器 
+//			builder.setMessage(s);
+//			builder.create().show(); 
 			
 			return true;
 		}

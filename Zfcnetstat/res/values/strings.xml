@@ -16,4 +16,6 @@
 	<string name="membershipStatement">上网调查已经启动！</string>
 	<string name="StartService">启动上网时长统计</string>
 	<string name="shortcutbutton">返回</string>
+	<string name="closePrompt">关闭提示</string>
+	<string name="openPrompt">打开提示</string>
 </resources>

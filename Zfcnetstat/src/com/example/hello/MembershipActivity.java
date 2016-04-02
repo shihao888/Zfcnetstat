@@ -124,15 +124,17 @@ public class MembershipActivity extends Activity implements OnClickListener{
 			return true;
 		}
 		if (id == R.id.cleartotal) {
-			profile.writeTime(0,"totaltime");
+			Toast.makeText(getApplicationContext(), "暂时不支持！" ,Toast.LENGTH_SHORT).show();
+			//profile.writeTime(0,"totaltime");
 		}
 		if (id == R.id.stopservice) {
-			if (isServiceStarted) {		
-				stopService(new Intent(this, MyService.class));
-				isServiceStarted = false;
-			}else{
-				Toast.makeText(getApplicationContext(), "服务已停止！" ,Toast.LENGTH_SHORT).show();
-			}
+			Toast.makeText(getApplicationContext(), "暂时不支持！" ,Toast.LENGTH_SHORT).show();
+//			if (isServiceStarted) {		
+//				stopService(new Intent(this, MyService.class));
+//				isServiceStarted = false;
+//			}else{
+//				Toast.makeText(getApplicationContext(), "服务已停止！" ,Toast.LENGTH_SHORT).show();
+//			}
 		}
 		return super.onOptionsItemSelected(item);
 	}

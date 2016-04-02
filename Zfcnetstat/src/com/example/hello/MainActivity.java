@@ -29,6 +29,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	EditText et_mobilenum,et_pwd;
 	String mobilenum,pwd;	
 	private ProfileUtil profile;
+	Zfcnetstat zfc; 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
@@ -42,7 +43,9 @@ public class MainActivity extends Activity implements OnClickListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);		
+		setContentView(R.layout.activity_main);
+		zfc = ((Zfcnetstat)this.getApplicationContext());
+		zfc.setPrompted(false);
 		profile = new ProfileUtil(this);
 		
 		
@@ -179,10 +182,31 @@ public class MainActivity extends Activity implements OnClickListener{
 			builder.create().show();			
 			return true;
 		}
-		
+		if (id == R.id.closePrompt) {			
+			zfc.setPrompted(false);
+			return true;
+		}
+		if (id == R.id.openPrompt) {			
+			zfc.setPrompted(true);
+			return true;
+		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		if(zfc.isPrompted()){
+			menu.findItem(R.id.openPrompt).setVisible(false);
+			menu.findItem(R.id.closePrompt).setVisible(true);
+		}
+		else{
+			menu.findItem(R.id.openPrompt).setVisible(true);
+			menu.findItem(R.id.closePrompt).setVisible(false);
+		}
+			
+		return super.onPrepareOptionsMenu(menu);
+	}
 	private void GotoNextActivity(Activity FromAct,Class<?> ToActCls,String InfoName, String InfoValue){
 		Intent intent = new Intent(); 
 		intent.putExtra(InfoName, InfoValue);
@@ -190,6 +214,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
 		FromAct.startActivity(intent);
 	}
+
 	
 	
 }

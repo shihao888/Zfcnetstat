@@ -120,7 +120,9 @@ public class MyService extends Service {
 			super.handleMessage(msg);
 			Bundle data = msg.getData();
 			String val = data.getString("MyValue");// 请求结果
-			Toast.makeText(mService.getApplicationContext(), val, Toast.LENGTH_LONG).show();
+			Zfcnetstat zfc = ((Zfcnetstat)mService.getApplicationContext());
+			if(zfc.isPrompted())
+			  Toast.makeText(mService.getApplicationContext(), val, Toast.LENGTH_LONG).show();
 		}
 	}
    

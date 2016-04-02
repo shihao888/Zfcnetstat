@@ -50,14 +50,7 @@ public class MembershipActivity extends Activity implements OnClickListener{
 		buttonStartService.setOnClickListener(this);  
 		
 	}
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onPostCreate(savedInstanceState);
-		isServiceStarted = isServiceRunning("com.example.hello.MyService");
-		if(isServiceStarted)buttonStartService.setEnabled(false);
-		else startmyservice();
-	}
+	
 	@Override
 	protected void onStart() {
 		// TODO Auto-generated method stub

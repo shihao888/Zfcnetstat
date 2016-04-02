@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProfileUtil {
 	public static final String mywebsite = "http://zfcnetstat.duapp.com";
+	public static final String LoginSuccessFlag = "OK"; //登录成功服务器返回的状态标记
 	private SharedPreferences sp;
 	private Activity myact;
 	private Service mysrv;

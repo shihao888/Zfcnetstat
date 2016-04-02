@@ -25,10 +25,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener{
-	Button buttonLogin, buttonRegister; 	 
+	Button buttonLogin, buttonRegister, buttonShortcut; 	 
 	EditText et_mobilenum,et_pwd;
-	String mobilenum,pwd;
-	String alreadyLoggedIn;
+	String mobilenum,pwd;	
 	private ProfileUtil profile;
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -45,6 +44,8 @@ public class MainActivity extends Activity implements OnClickListener{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);		
 		profile = new ProfileUtil(this);
+		
+		
 				
 		// 通过 findViewById(id)方法获取用户名和密码控件对象  
 		et_mobilenum = (EditText) findViewById(R.id.et_mobilenum);  
@@ -60,29 +61,38 @@ public class MainActivity extends Activity implements OnClickListener{
 	}
 	@Override
 	protected void onStart() {
-		// TODO Auto-generated method stub
-		super.onStart();
-		//如果已经登录过
-		alreadyLoggedIn = profile.readParam("loginSuccess");
-		if (alreadyLoggedIn != null && alreadyLoggedIn.equals("OK")) {
-			GotoNextActivity(this, MembershipActivity.class, "mobilenum", profile.readParam("mobilenum"));
-		}
+		
+		// 如果曾经成功登录过,2分钟内不用再次登录，而显示直接跳转按钮
+		buttonShortcut = (Button) findViewById(R.id.buttonShortcut);
+		if (isAlreadyLoggedIn()) {
+			buttonShortcut.setVisibility(View.VISIBLE);// 显示按钮
+			buttonShortcut.setOnClickListener(this);
+		} else
+			buttonShortcut.setVisibility(View.GONE);// 隐藏按钮
 	}
 	
+	private Boolean isAlreadyLoggedIn() {
+		final int const_time = 2;//时间间隔2分钟
+		// 如果成功登录
+		if((ProfileUtil.LoginSuccessFlag).equals(profile.readParam("loginSuccess"))){
+			long currentTime = System.currentTimeMillis();
+			long loginSuccessTime = profile.readTime("loginSuccessTime");//之前成功登录时间
+			if(loginSuccessTime==0l)return false;//没有设置过loginSuccessTime，说明还未成功登录过
+			
+			int timeInterval = (int)((currentTime - loginSuccessTime) / ( 1000 * 60 )); //时间间隔是几分钟
+			return (timeInterval<const_time)?true:false; //小于2分钟的登录返回TRUE
+		}else 
+			return false;
+		
+	}
+
 	@Override
 	public void onClick(View src) {
 		// TODO Auto-generated method stub
 				
 		switch (src.getId()) {
 		case R.id.buttonlogin:
-			
-    		//如果已经登录过
-    		alreadyLoggedIn = profile.readParam("loginSuccess");
-    		if(alreadyLoggedIn!=null&&alreadyLoggedIn.equals("OK")){
-    			GotoNextActivity(this,MembershipActivity.class,"mobilenum",profile.readParam("mobilenum"));
-    			return;
-    		}
-    		
+			    		
     		// 获取用户手机号  
             mobilenum = et_mobilenum.getText().toString();  
             // 获取用户密码
@@ -97,8 +107,9 @@ public class MainActivity extends Activity implements OnClickListener{
 		case R.id.buttonregister:
 			GotoNextActivity(this, RegisterActivity.class, "", "");
 			break;
-			
-			
+		case R.id.buttonShortcut:
+			GotoNextActivity(this, MembershipActivity.class, "mobilenum", mobilenum);
+			break;
 		}
 		return;
 	}
@@ -138,9 +149,10 @@ public class MainActivity extends Activity implements OnClickListener{
 			String val = data.getString("MyValue");//请求结果
 			Toast.makeText(mActivity.getApplicationContext(), val, Toast.LENGTH_LONG).show();
 			//如果登录成功
-			if(val!=null&&val.equals("OK")){
+			if(val!=null&&val.equals(ProfileUtil.LoginSuccessFlag)){
 			mActivity.profile.writeParam("mobilenum",mActivity.mobilenum);
-			mActivity.profile.writeParam("loginSuccess","OK");			
+			mActivity.profile.writeParam("loginSuccess",ProfileUtil.LoginSuccessFlag);
+			mActivity.profile.writeTime(System.currentTimeMillis(),"loginSuccessTime");	//记下成功登录时间
 			mActivity.GotoNextActivity(mActivity,MembershipActivity.class,"mobilenum",mActivity.mobilenum);
 			}
         }  
@@ -161,7 +173,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			String s="版本version 6 \n"+"用户id:"+profile.readParam("userid");
+			String s="版本version 6 \n"+"用户:"+profile.readParam("mobilenum");
 			AlertDialog.Builder builder=new AlertDialog.Builder(this);  //先得到构造器 
 			builder.setMessage(s);
 			builder.create().show();			
@@ -178,7 +190,6 @@ public class MainActivity extends Activity implements OnClickListener{
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
 		FromAct.startActivity(intent);
 	}
-
 	
 	
 }

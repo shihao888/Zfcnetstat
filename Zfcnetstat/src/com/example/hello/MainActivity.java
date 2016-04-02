@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		zfc = ((Zfcnetstat)this.getApplicationContext());
+		zfc = ((Zfcnetstat)getApplicationContext());
 		zfc.setPrompted(false);
 		profile = new ProfileUtil(this);
 		
@@ -72,6 +72,10 @@ public class MainActivity extends Activity implements OnClickListener{
 			buttonShortcut.setOnClickListener(this);
 		} else
 			buttonShortcut.setVisibility(View.GONE);// 隐藏按钮
+		//这一句不能省
+		//在重写 onStart()、onStop()、onResume()、onPause()、onDestroy() 等等函数的时候
+		//一定要在函数中加上一句 super.onXX();否则就会报错。
+		super.onStart();
 	}
 	
 	private Boolean isAlreadyLoggedIn() {
@@ -184,10 +188,12 @@ public class MainActivity extends Activity implements OnClickListener{
 		}
 		if (id == R.id.closePrompt) {			
 			zfc.setPrompted(false);
+			invalidateOptionsMenu();
 			return true;
 		}
 		if (id == R.id.openPrompt) {			
 			zfc.setPrompted(true);
+			invalidateOptionsMenu();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

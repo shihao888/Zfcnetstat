@@ -12,7 +12,7 @@ public class Zfcnetstat extends Application {
 		return isPrompted;
 	}
 
-	public void setPrompted(boolean isPrompted) {
-		isPrompted = isPrompted;
+	public void setPrompted(boolean b) {
+		this.isPrompted = b;
 	}
 }

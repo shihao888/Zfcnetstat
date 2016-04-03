@@ -5,5 +5,8 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="E:/dev/SDKLib/SMSSDK/SMSSDK/libs/MobCommons-2016.0303.1229.jar"/>
+	<classpathentry kind="lib" path="E:/dev/SDKLib/SMSSDK/SMSSDK/libs/MobTools-2016.0303.1229.jar"/>
+	<classpathentry kind="lib" path="E:/dev/SDKLib/SMSSDK/SMSSDK/libs/SMSSDK-2.0.2.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

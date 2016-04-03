@@ -4,29 +4,20 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -210,7 +201,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			String s="当前版本："+config.getVerCode(this)+"\n用户:"+profile.readParam("mobilenum")+"\n开发团队：周宏敏、史浩";
+			String s="当前版本："+Config.getVerCode(this)+"\n用户:"+profile.readParam("mobilenum")+"\n开发团队：周宏敏、史浩";
 			AlertDialog.Builder builder=new AlertDialog.Builder(this);  //先得到构造器 
 			builder.setMessage(s);
 			builder.create().show();			
@@ -270,7 +261,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	public ProgressDialog pBar;	
 	private int newVerCode = 0;
 	private String newVerName = "";	
-	Config config;
+	
 	private void checkNewVersion() {
 		
 		// 启动线程获取版本信息ver.json
@@ -279,10 +270,9 @@ public class MainActivity extends Activity implements OnClickListener{
 		new Thread(httpThread).start();
 	}
 	private void analyseVersion(String verjson) {
-		//配置好config
-		config = new Config(this.getApplicationContext());
+		
 		if (getServerVerCode(verjson)) {
-			int vercode = config.getVerCode(this);
+			int vercode = Config.getVerCode(this);
 			if (newVerCode > vercode) {
 				doNewVersionUpdate();
 
@@ -313,8 +303,8 @@ public class MainActivity extends Activity implements OnClickListener{
 	}
 
 	private void notNewVersionShow() {
-		int verCode = config.getVerCode(this);
-		String verName = config.getVerName(this);
+		int verCode = Config.getVerCode(this);
+		String verName = Config.getVerName(this);
 		StringBuffer sb = new StringBuffer();
 		sb.append("当前版本:");
 		sb.append(verName);
@@ -335,8 +325,8 @@ public class MainActivity extends Activity implements OnClickListener{
 	}
 
 	private void doNewVersionUpdate() {
-		int verCode = config.getVerCode(this);
-		String verName = config.getVerName(this);
+		int verCode = Config.getVerCode(this);
+		String verName = Config.getVerName(this);
 		StringBuffer sb = new StringBuffer();
 		sb.append("当前版本:");
 		sb.append(verName);

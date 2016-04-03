@@ -210,7 +210,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			String s="版本version 6 \n"+"用户:"+profile.readParam("mobilenum");
+			String s="当前版本："+config.getVerCode(this)+"\n用户:"+profile.readParam("mobilenum")+"\n开发团队：周宏敏、史浩";
 			AlertDialog.Builder builder=new AlertDialog.Builder(this);  //先得到构造器 
 			builder.setMessage(s);
 			builder.create().show();			

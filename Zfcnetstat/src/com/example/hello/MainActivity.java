@@ -99,7 +99,7 @@ public class MainActivity extends Activity implements OnClickListener{
 				
 		switch (src.getId()) {
 		case R.id.buttonlogin:
-			    		
+			buttonLogin.setEnabled(false);    		
     		// 获取用户手机号  
             mobilenum = et_mobilenum.getText().toString();  
             // 获取用户密码
@@ -162,6 +162,7 @@ public class MainActivity extends Activity implements OnClickListener{
 			mActivity.profile.writeTime(System.currentTimeMillis(),"loginSuccessTime");	//记下成功登录时间
 			mActivity.GotoNextActivity(mActivity,MembershipActivity.class,"mobilenum",mActivity.mobilenum);
 			}
+			mActivity.buttonLogin.setEnabled(true); 
         }  
     }  
 

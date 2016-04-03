@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -84,16 +85,21 @@ public class MyService extends Service {
 						Toast.makeText(getApplicationContext(), info.getTypeName(),Toast.LENGTH_SHORT).show();
 						//将之前的上网时间数值上传网站（在WIFI或者MOBILE情况下）
 						if(info.getType() == ConnectivityManager.TYPE_MOBILE||info.getType() == ConnectivityManager.TYPE_WIFI){
-							if(timer!=null&&task!=null){
-								timer.cancel();
-								timer.schedule(task, 1000, 60000); // 1s后执行task,然后每隔60s连续执行 
+							if(timer==null){
+								timer = new Timer();
 							}
+							if(task==null){
+								task = new MyTimerTask();
+							}
+							//Timer和TimerTask在调用cancel()取消后不能再执行 schedule语句，否则提示出错
+							timer.schedule(task, 1000, 60000); // 1s后执行task,然后每隔60s连续执行 
+							
 						}
 					}
 					else{
 						Toast.makeText(getApplicationContext(), "没有可用网络",Toast.LENGTH_SHORT).show();
 						//停止计时
-						if(timer!=null)timer.cancel();
+						cancelTimerandTask();
 						long stoptime = System.currentTimeMillis();						
 						long totaltime = profile.readTime("totaltime")+stoptime-profile.readTime("starttime"); 
 						profile.writeTime(totaltime,"totaltime"); //记录总时间
@@ -157,12 +163,10 @@ public class MyService extends Service {
 		unregisterReceiver(mReceiver); // 删除广播
 		
 		stopForeground(true); 
-
-		if (timer != null) {
-			timer.cancel();
-			timer = null;
-		}
+		cancelTimerandTask();
+		
 	}
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -172,7 +176,8 @@ public class MyService extends Service {
 	}
 	//定时器
 	Timer timer = new Timer();  
-    TimerTask task = new TimerTask() {  
+    TimerTask task = new MyTimerTask(); 
+    private class MyTimerTask extends TimerTask {  
   
         @Override  
         public void run() {  
@@ -192,13 +197,28 @@ public class MyService extends Service {
 			sendBroadcast(intent);
         	connectNodejsServer(); 
         }  
-    };  
+    }; 
+    private void cancelTimerandTask() {
+		// TODO Auto-generated method stub
+		if (task != null) {
+			task.cancel();
+			task = null;
+		}
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
+	}
     private void connectNodejsServer() {
 		
 		String[] s = new String[2];
 		try {
 			s[0] = URLEncoder.encode(profile.readParam("mobilenum"), "UTF-8");
-			s[1] = URLEncoder.encode(String.valueOf(profile.readTime("totaltime")), "UTF-8");			
+			long t = profile.readTime("totaltime");
+			float hour = (float)t / ( 1000 * 60 * 60 ); //毫秒转小时
+			DecimalFormat   fnum  =   new  DecimalFormat("##0.00");
+			String str = fnum.format(hour);//小时保留2位小数
+			s[1] = URLEncoder.encode(str, "UTF-8");			
 			String site = ProfileUtil.mywebsite+"/upload";
 			String url = site + "?mobilenum="+s[0]+"&onlinetime=" + s[1];
 

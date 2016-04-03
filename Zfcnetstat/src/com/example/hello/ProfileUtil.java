@@ -20,6 +20,11 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProfileUtil {
+	public static final int MSG_LOGIN = 200; 		//登录
+	public static final int MSG_VERSION = 201;		//检查版本更新
+	public static final int MSG_UPLOAD = 202;		//上传在线时间
+	public static final int MSG_Register = 203;		//注册用户
+	
 	public static final String mywebsite = "http://zfcnetstat.duapp.com";
 	public static final String LoginSuccessFlag = "OK"; //登录成功服务器返回的状态标记
 	private SharedPreferences sp;

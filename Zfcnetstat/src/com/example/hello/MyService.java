@@ -16,6 +16,7 @@ import java.util.TimerTask;
 
 import android.app.AlertDialog;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -126,26 +127,56 @@ public class MyService extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
-			Bundle data = msg.getData();
-			String val = data.getString("MyValue");// 请求结果
-			Zfcnetstat zfc = ((Zfcnetstat)mService.getApplicationContext());
-			if(zfc.isPrompted())
-			  Toast.makeText(mService.getApplicationContext(), val, Toast.LENGTH_LONG).show();
+			switch (msg.what) {
+        	case ProfileUtil.MSG_UPLOAD:
+				Bundle data = msg.getData();
+				String val = data.getString("MyValue");// 请求结果
+				Zfcnetstat zfc = ((Zfcnetstat)mService.getApplicationContext());
+				if(zfc.isPrompted())
+				  Toast.makeText(mService.getApplicationContext(), val, Toast.LENGTH_LONG).show();
+				break;
+			}
 		}
 	}
-   
-    private void improvePriority() {  
+    private Notification mkNotification(String strNotificationText){
+    	Intent intent = new Intent(this,MainActivity.class); //点击通知栏，会转到哪个activity
+    	/*
+		 * 注意Intent的flag设置：
+		 * FLAG_ACTIVITY_CLEAR_TOP: 如果activity已在当前任务中运行，在它前端的activity都会被关闭，
+		 * 它就成了最前端的activity。
+		 * FLAG_ACTIVITY_SINGLE_TOP: 如果activity已经在最前端运行，则不需要再加载。
+		 * 设置这两个flag，就是让一个且唯一的一个activity（服务界面）运行在最前端。
+		 */
+    	intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    	
 	    PendingIntent contentIntent = PendingIntent.getActivity(this, 0,  
-	            new Intent(this, MyService.class), 0);  
+	            intent, 0);  
 	    Notification notification = new Notification.Builder(this)  
-	            .setContentTitle("Foreground Service")  
-	            .setContentText("Foreground Service Started.")  
-	            .setSmallIcon(R.drawable.ic_launcher).build();  
-	    notification.contentIntent = contentIntent;  
+	            .setContentTitle("浙江金融职业学院")  
+	            .setContentText(strNotificationText)  
+	            .setSmallIcon(R.drawable.ic_launcher).build();	    
+	    notification.contentIntent = contentIntent;	    
+	    return notification;
+    }
+    private void improvePriority() {
+    	Notification notification = mkNotification("上网时长调查服务已启动."); 
+    	//设置notification的flag，表明在点击通知后，通知并不会消失，仍在通知栏显示图标。
+	    //这是确保在activity中退出后，状态栏仍有图标可提下拉、点击，再次进入activity。
+	    notification.flags |= Notification.FLAG_NO_CLEAR;
 	    startForeground(1, notification);  //0 将不会显示 notification
-	} 
+	}
+    private void sendNotification() {
+		//获取通知管理器
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		//新建一个通知，指定其图标和标题		 
+	    Notification notification = mkNotification("上网时长调查服务已停止！！"); 
+	    notification.defaults = Notification.DEFAULT_SOUND;//发出默认声音
+	    notification.flags |= Notification.FLAG_AUTO_CANCEL;//点击通知后自动清除通知
+	    mNotificationManager.notify(0, notification);//第一个参数为自定义的通知唯一标识
+	}
 	@Override
 	public void onCreate() {
+		super.onCreate();
 		improvePriority();
 		//		
 		profile = new ProfileUtil(this);
@@ -164,9 +195,9 @@ public class MyService extends Service {
 		
 		stopForeground(true); 
 		cancelTimerandTask();
+		sendNotification();
 		
 	}
-	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -225,10 +256,9 @@ public class MyService extends Service {
 			// 启动线程更新网站端数据库
 			//让需要sendMessage的线程知道用哪个handler往哪个Looper发消息
 			MyHandler h = new MyHandler(Looper.getMainLooper(),MyService.this); //对外部类对象的引用	
-			HttpGetThread httpThread = new HttpGetThread(url, h);
+			HttpGetThread httpThread = new HttpGetThread(url, h, ProfileUtil.MSG_UPLOAD);
 			new Thread(httpThread).start();
 			
-
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

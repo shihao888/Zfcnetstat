@@ -9,4 +9,5 @@
         android:title="@string/action_settings"/>
     <item android:id="@+id/closePrompt" android:title="@string/closePrompt"></item>
     <item android:id="@+id/openPrompt" android:title="@string/openPrompt"></item>
+    <item android:id="@+id/checkNewversion" android:title="@string/checkNewVer"></item>
 </menu>

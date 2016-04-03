@@ -121,7 +121,7 @@ public class RegisterActivity extends Activity implements OnClickListener{
 
 				// 启动线程更新网站端数据库
 				Handler h = new MyHandler(this);
-				HttpGetThread httpThread = new HttpGetThread(url, h);
+				HttpGetThread httpThread = new HttpGetThread(url, h , ProfileUtil.MSG_Register);
 				new Thread(httpThread).start();
 				
 				
@@ -143,10 +143,14 @@ public class RegisterActivity extends Activity implements OnClickListener{
         @Override  
         public void handleMessage(Message msg) {  
         	super.handleMessage(msg);
-			Bundle data = msg.getData();
-			String val = data.getString("MyValue");//请求结果
-			Toast.makeText(mActivity.getApplicationContext(), val, Toast.LENGTH_LONG).show();
-			mActivity.finish();
+        	switch(msg.what){
+        	case ProfileUtil.MSG_Register:
+				Bundle data = msg.getData();
+				String val = data.getString("MyValue");//请求结果
+				Toast.makeText(mActivity.getApplicationContext(), val, Toast.LENGTH_LONG).show();
+				mActivity.finish();
+				break;
+        	}
         }  
     }  
 

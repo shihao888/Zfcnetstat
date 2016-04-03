@@ -1,11 +1,13 @@
 package com.example.hello;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -13,6 +15,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.Map;
+import org.json.*;
 
 
 public class HttpRequestor {
@@ -22,7 +25,7 @@ public class HttpRequestor {
     private Integer socketTimeout = null;
     private String proxyHost = null;
     private Integer proxyPort = null;
-    
+
     /**
      * Do GET request
      * @param url

@@ -1,20 +1,32 @@
 package com.example.hello;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,8 +72,13 @@ public class MainActivity extends Activity implements OnClickListener{
   
         buttonLogin.setOnClickListener(this);  
         buttonRegister.setOnClickListener(this); 
+        
+        //检查是否有版本更新
+        checkNewVersion();
 
 	}
+	
+
 	@Override
 	protected void onStart() {
 		
@@ -131,7 +148,7 @@ public class MainActivity extends Activity implements OnClickListener{
 
 			// 启动线程更新网站端数据库
 			Handler h = new MyHandler(this);
-			HttpGetThread httpThread = new HttpGetThread(url, h);
+			HttpGetThread httpThread = new HttpGetThread(url, h, ProfileUtil.MSG_LOGIN);
 			new Thread(httpThread).start();
 			
 			
@@ -152,17 +169,29 @@ public class MainActivity extends Activity implements OnClickListener{
         @Override  
         public void handleMessage(Message msg) {  
         	super.handleMessage(msg);
-			Bundle data = msg.getData();
-			String val = data.getString("MyValue");//请求结果
-			Toast.makeText(mActivity.getApplicationContext(), val, Toast.LENGTH_LONG).show();
-			//如果登录成功
-			if(val!=null&&val.equals(ProfileUtil.LoginSuccessFlag)){
-			mActivity.profile.writeParam("mobilenum",mActivity.mobilenum);
-			mActivity.profile.writeParam("loginSuccess",ProfileUtil.LoginSuccessFlag);
-			mActivity.profile.writeTime(System.currentTimeMillis(),"loginSuccessTime");	//记下成功登录时间
-			mActivity.GotoNextActivity(mActivity,MembershipActivity.class,"mobilenum",mActivity.mobilenum);
-			}
-			mActivity.buttonLogin.setEnabled(true); 
+        	switch (msg.what) {
+        	case ProfileUtil.MSG_LOGIN:        	
+				Bundle data = msg.getData();
+				String val = data.getString("MyValue");//请求结果
+				Toast.makeText(mActivity.getApplicationContext(), val, Toast.LENGTH_LONG).show();
+				//如果登录成功
+				if(val!=null&&val.equals(ProfileUtil.LoginSuccessFlag)){
+				mActivity.profile.writeParam("mobilenum",mActivity.mobilenum);
+				mActivity.profile.writeParam("loginSuccess",ProfileUtil.LoginSuccessFlag);
+				mActivity.profile.writeTime(System.currentTimeMillis(),"loginSuccessTime");	//记下成功登录时间
+				mActivity.GotoNextActivity(mActivity,MembershipActivity.class,"mobilenum",mActivity.mobilenum);
+				}
+				mActivity.buttonLogin.setEnabled(true);
+				break;
+        	case ProfileUtil.MSG_VERSION:
+        		Bundle data1 = msg.getData();
+				String val1 = data1.getString("MyValue");//请求结果
+				mActivity.analyseVersion(val1);
+        		break;
+        	default:
+        		break;
+        		
+        	}
         }  
     }  
 
@@ -197,6 +226,11 @@ public class MainActivity extends Activity implements OnClickListener{
 			invalidateOptionsMenu();
 			return true;
 		}
+		if (id == R.id.checkNewversion) {			
+			//检查是否有版本更新
+	        checkNewVersion();
+			return true;
+		}
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -218,10 +252,135 @@ public class MainActivity extends Activity implements OnClickListener{
 		Intent intent = new Intent(); 
 		intent.putExtra(InfoName, InfoValue);
 		intent.setClass(FromAct,ToActCls);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
+		/*
+		 * 注意Intent的flag设置：
+		 * FLAG_ACTIVITY_CLEAR_TOP: 如果activity已在当前任务中运行，在它前端的activity都会被关闭，
+		 * 它就成了最前端的activity。
+		 * FLAG_ACTIVITY_SINGLE_TOP: 如果activity已经在最前端运行，则不需要再加载。
+		 * 设置这两个flag，就是让一个且唯一的一个activity（服务界面）运行在最前端。
+		 */
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
 		FromAct.startActivity(intent);
 	}
 
-	
-	
+	/*
+	 * 检查是否为新版本
+	 */
+	private Handler handler = new Handler();	
+	public ProgressDialog pBar;	
+	private int newVerCode = 0;
+	private String newVerName = "";	
+	Config config;
+	private void checkNewVersion() {
+		
+		// 启动线程获取版本信息ver.json
+		Handler h = new MyHandler(this);
+		HttpGetThread httpThread = new HttpGetThread(Config.UPDATE_SERVER + Config.UPDATE_VERJSON, h, ProfileUtil.MSG_VERSION);
+		new Thread(httpThread).start();
+	}
+	private void analyseVersion(String verjson) {
+		//配置好config
+		config = new Config(this.getApplicationContext());
+		if (getServerVerCode(verjson)) {
+			int vercode = config.getVerCode(this);
+			if (newVerCode > vercode) {
+				doNewVersionUpdate();
+
+			} else {
+				notNewVersionShow();
+			}
+		}
+		
+	}
+	private boolean getServerVerCode(String verjson) {
+		try {						
+			JSONArray array = new JSONArray(verjson);
+			if (array.length() > 0) {
+				JSONObject obj = array.getJSONObject(0);
+				try {
+					newVerCode = Integer.parseInt(obj.getString("verCode"));
+					newVerName = obj.getString("verName");
+				} catch (Exception e) {
+					newVerCode = -1;
+					newVerName = "";
+					return false;
+				}
+			}
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	private void notNewVersionShow() {
+		int verCode = config.getVerCode(this);
+		String verName = config.getVerName(this);
+		StringBuffer sb = new StringBuffer();
+		sb.append("当前版本:");
+		sb.append(verName);
+		sb.append(" Code:");
+		sb.append(verCode);
+		sb.append(",\n已是最新版,无需更新!");
+		Dialog dialog = new AlertDialog.Builder(this).setTitle("软件更新").setMessage(sb.toString())//设置内容
+				.setPositiveButton("确定",// 设置确定按钮
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								finish();
+							}
+
+						})
+				.create();
+		dialog.show();
+	}
+
+	private void doNewVersionUpdate() {
+		int verCode = config.getVerCode(this);
+		String verName = config.getVerName(this);
+		StringBuffer sb = new StringBuffer();
+		sb.append("当前版本:");
+		sb.append(verName);
+		sb.append(" Code:");
+		sb.append(verCode);
+		sb.append(", 发现新版本:");
+		sb.append(newVerName);
+		sb.append(" Code:");
+		sb.append(newVerCode);
+		sb.append(", 是否更新?");
+		Dialog dialog = new AlertDialog.Builder(this).setTitle("软件更新").setMessage(sb.toString())
+				//设置内容
+				.setPositiveButton("更新",// 设置确定按钮
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								Intent intent = new Intent(getApplicationContext(), UpdateService.class);
+								intent.putExtra("app_english_name", getResources().getString(R.string.app_english_name));
+								startService(intent);//启动更新服务UpdateService！！
+							}
+
+						})
+				.setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						//点击"取消"按钮之后退出程序
+						finish();
+					}
+				}).create();
+		dialog.show();
+	}
+	void down() {
+		handler.post(new Runnable() {
+			public void run() {
+				pBar.cancel();
+				update();
+			}
+		});
+
+	}
+
+	void update() {
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory(), Config.UPDATE_SAVENAME)),
+				"application/vnd.android.package-archive");
+		startActivity(intent);
+	}
 }

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    
+	<string name="app_versionName">3.0.1</string>
     <string name="app_name">上网时长统计</string>
+    <string name="app_english_name">zfcnetstat</string>
     <string name="hello_world">浙江金融职业学院上网时长调查，本程序将会在后台运行，不会传播您任何隐私信息。-- 程序由周宏敏、史浩QQ454759425共同策划开发。</string>
     <string name="action_settings">关于...</string>
     <string name="action_chkmyservice">查看后台服务是否运行</string>
@@ -18,4 +20,6 @@
 	<string name="shortcutbutton">返回</string>
 	<string name="closePrompt">关闭提示</string>
 	<string name="openPrompt">打开提示</string>
+	<string name="checkNewVer">检查新版本</string>
+	
 </resources>

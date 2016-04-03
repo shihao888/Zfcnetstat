@@ -38,8 +38,8 @@ public class RegisterActivity extends Activity implements OnClickListener{
 	Button requestCodeBtn;
 	EditText inputCodeEt;
 	int i = 30; //倒计时
-	String APPKEY = "113589082c5b5";    
-    String APPSECRETE = "e42ab57e47c84a6286f630be8632570a";
+	private static String APPKEY = "113589082c5b5";    
+    private static String APPSECRETE = "e42ab57e47c84a6286f630be8632570a";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -48,10 +48,7 @@ public class RegisterActivity extends Activity implements OnClickListener{
 		setContentView(R.layout.activity_register);
 		setTitle("用户注册");
 		profile = new ProfileUtil(this);
-		
-		// 获取用户手机号 
-        mobilenum = ((EditText)findViewById(R.id.reg_mobilenum)).getText().toString();
-		
+				
 		buttonOK = (Button) findViewById(R.id.registerOK);  
         buttonCancel = (Button) findViewById(R.id.registerCancel);  
   
@@ -71,7 +68,7 @@ public class RegisterActivity extends Activity implements OnClickListener{
         requestCodeBtn = (Button) findViewById(R.id.sms_getcode);
         requestCodeBtn.setOnClickListener(this);
         inputCodeEt = (EditText) findViewById(R.id.input_smscode);
-        initSDK();
+        
 	}
 
 	@Override
@@ -94,7 +91,8 @@ public class RegisterActivity extends Activity implements OnClickListener{
 				return;
 			} 
 				
-			
+			// 获取用户手机号 
+	        mobilenum = ((EditText)findViewById(R.id.reg_mobilenum)).getText().toString();
             //判断短信验证码
 			//将收到的验证码和手机号提交再次核对    
             SMSSDK.submitVerificationCode("86", mobilenum, inputCodeEt.getText().toString());
@@ -127,6 +125,9 @@ public class RegisterActivity extends Activity implements OnClickListener{
 			break;
 			
 		case R.id.sms_getcode://发送验证码
+			// 获取用户手机号 
+	        mobilenum = ((EditText)findViewById(R.id.reg_mobilenum)).getText().toString();
+			initSDK();
 			// 1. 通过规则判断手机号  
             if (!judgePhoneNums(mobilenum)) {  
                 return;  
@@ -252,8 +253,8 @@ public class RegisterActivity extends Activity implements OnClickListener{
 	 */
 	private void initSDK() {
 		
-		SMSSDK.initSDK(this.getApplicationContext(), APPKEY, APPSECRETE);
-		EventHandler eventHandler = new EventHandler() {
+		cn.smssdk.SMSSDK.initSDK(this, APPKEY, APPSECRETE,true);
+		cn.smssdk.EventHandler eventHandler = new EventHandler() {
 			/**
 			 * 在操作之后被触发
 			 * 

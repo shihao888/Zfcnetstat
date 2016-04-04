@@ -74,12 +74,12 @@ public class MainActivity extends Activity implements OnClickListener{
 	protected void onStart() {
 		
 		// 如果曾经成功登录过,2分钟内不用再次登录，而显示直接跳转按钮
-//		buttonShortcut = (Button) findViewById(R.id.buttonShortcut);
-//		if (isAlreadyLoggedIn()) {
-//			buttonShortcut.setVisibility(View.VISIBLE);// 显示按钮
-//			buttonShortcut.setOnClickListener(this);
-//		} else
-//			buttonShortcut.setVisibility(View.GONE);// 隐藏按钮
+		buttonShortcut = (Button) findViewById(R.id.buttonShortcut);
+		if (isAlreadyLoggedIn()) {
+			buttonShortcut.setVisibility(View.VISIBLE);// 显示按钮
+			buttonShortcut.setOnClickListener(this);
+		} else
+			buttonShortcut.setVisibility(View.GONE);// 隐藏按钮
 		//这一句不能省
 		//在重写 onStart()、onStop()、onResume()、onPause()、onDestroy() 等等函数的时候
 		//一定要在函数中加上一句 super.onXX();否则就会报错。
@@ -106,8 +106,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		// TODO Auto-generated method stub
 				
 		switch (src.getId()) {
-		case R.id.buttonlogin:
-			buttonLogin.setEnabled(false);    		
+		case R.id.buttonlogin:			    		
     		// 获取用户手机号  
             mobilenum = et_mobilenum.getText().toString();  
             // 获取用户密码
@@ -116,6 +115,7 @@ public class MainActivity extends Activity implements OnClickListener{
                 Toast.makeText(this, "手机号和密码都不能为空,调查服务没有启动！", Toast.LENGTH_LONG).show();
                 return;
             }else{
+            	buttonLogin.setEnabled(false);
             	login(mobilenum,pwd);       	
             }                       
 			break;

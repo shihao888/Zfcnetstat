@@ -74,12 +74,12 @@ public class MainActivity extends Activity implements OnClickListener{
 	protected void onStart() {
 		
 		// 如果曾经成功登录过,2分钟内不用再次登录，而显示直接跳转按钮
-		buttonShortcut = (Button) findViewById(R.id.buttonShortcut);
-		if (isAlreadyLoggedIn()) {
-			buttonShortcut.setVisibility(View.VISIBLE);// 显示按钮
-			buttonShortcut.setOnClickListener(this);
-		} else
-			buttonShortcut.setVisibility(View.GONE);// 隐藏按钮
+//		buttonShortcut = (Button) findViewById(R.id.buttonShortcut);
+//		if (isAlreadyLoggedIn()) {
+//			buttonShortcut.setVisibility(View.VISIBLE);// 显示按钮
+//			buttonShortcut.setOnClickListener(this);
+//		} else
+//			buttonShortcut.setVisibility(View.GONE);// 隐藏按钮
 		//这一句不能省
 		//在重写 onStart()、onStop()、onResume()、onPause()、onDestroy() 等等函数的时候
 		//一定要在函数中加上一句 super.onXX();否则就会报错。
@@ -251,9 +251,19 @@ public class MainActivity extends Activity implements OnClickListener{
 		 * 设置这两个flag，就是让一个且唯一的一个activity（服务界面）运行在最前端。
 		 */
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
-		FromAct.startActivity(intent);
+		FromAct.startActivityForResult(intent, 0);
 	}
-
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		switch (resultCode) { 
+		case RESULT_OK:
+			Bundle b=data.getExtras(); //data为B中回传的Intent
+			String str=b.getString("voice from RegisterActivity");
+			break;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 	/*
 	 * 检查是否为新版本
 	 */
@@ -373,4 +383,6 @@ public class MainActivity extends Activity implements OnClickListener{
 				"application/vnd.android.package-archive");
 		startActivity(intent);
 	}
+
+	
 }

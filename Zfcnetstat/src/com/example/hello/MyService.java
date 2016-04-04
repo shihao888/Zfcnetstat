@@ -225,8 +225,8 @@ public class MyService extends Service {
 			bundle.putLong("totaltime", totaltime);
 			intent.putExtras(bundle);
 			intent.setAction("android.intent.action.OnlineTimeUpdate");//action与接收器相同
-			sendBroadcast(intent);
-        	connectNodejsServer(); 
+			sendBroadcast(intent); //更新本地：更新membershipActivity显示界面
+        	connectNodejsServer(); //更新远程：更新服务器
         }  
     }; 
     private void cancelTimerandTask() {

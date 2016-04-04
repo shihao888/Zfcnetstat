@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,7 +24,7 @@ import cn.smssdk.SMSSDK;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ProgressBar;
 
-public class RegisterActivity extends Activity implements OnClickListener{
+public class RegisterActivitySMS extends Activity implements OnClickListener{
 	//验证码
 	ImageView vc_image; // 图标
 	Button vc_shuaxin, vc_ok; // 确定和刷新验证码
@@ -63,6 +64,10 @@ public class RegisterActivity extends Activity implements OnClickListener{
         vc_shuaxin=(Button)findViewById(R.id.vc_shuaxin);
         vc_shuaxin.setOnClickListener(this);
         
+        //短信验证手机号        
+        requestCodeBtn = (Button) findViewById(R.id.sms_getcode);
+        requestCodeBtn.setOnClickListener(this);
+        inputCodeEt = (EditText) findViewById(R.id.input_smscode);
         
 	}
 
@@ -79,13 +84,25 @@ public class RegisterActivity extends Activity implements OnClickListener{
 			//判断验证码是否正确
 			String v_code = vc_code.getText().toString().trim();
 			if (v_code == null || v_code.equals("")) {
-				Toast.makeText(RegisterActivity.this, "没有填写验证码", Toast.LENGTH_LONG).show();
+				Toast.makeText(RegisterActivitySMS.this, "没有填写验证码", Toast.LENGTH_LONG).show();
 				return;
 			} else if (!v_code.equals(getCode)) {
-				Toast.makeText(RegisterActivity.this, "验证码填写不正确", Toast.LENGTH_LONG).show();
+				Toast.makeText(RegisterActivitySMS.this, "验证码填写不正确", Toast.LENGTH_LONG).show();
 				return;
 			} 
-			
+			String smscode = inputCodeEt.getText().toString();
+			if(mobilenum==null||mobilenum.isEmpty()){
+				Toast.makeText(RegisterActivitySMS.this, "没有填写手机号", Toast.LENGTH_LONG).show();
+				return;	
+			}
+			if(smscode==null||smscode.isEmpty()){
+				Toast.makeText(RegisterActivitySMS.this, "没有填写手机验证码", Toast.LENGTH_LONG).show();
+				return;	
+			}
+            //判断短信验证码
+			//将收到的验证码和手机号提交再次核对    
+            SMSSDK.submitVerificationCode("86", mobilenum, smscode);
+            //createProgressBar(); 
             // 获取用户密码
             pwd1 = ((EditText)findViewById(R.id.pwd1)).getText().toString(); 
             pwd2 = ((EditText)findViewById(R.id.pwd2)).getText().toString();
@@ -113,11 +130,55 @@ public class RegisterActivity extends Activity implements OnClickListener{
 			finish();
 			break;
 			
-		
+		case R.id.sms_getcode://发送验证码
+			
+	        initSDK();
+			
+            							
+  
+            // 3. 把按钮变成不可点击，并且显示倒计时（正在获取）  
+//            requestCodeBtn.setClickable(false);  
+//            requestCodeBtn.setText("重新发送(" + i-- + ")"); 
+//            Handler h = new MyHandler(Looper.getMainLooper(),RegisterActivity.this);
+//			SendSMSThread smsThread = new SendSMSThread(h);
+//			new Thread(smsThread).start();
+			
+            // 4. 打开广播来接受读取短信  
+  
+            
+			break;
 		}
 			
 	}
+	
+	private class SendSMSThread implements Runnable {
+		Handler handler;
+		public SendSMSThread(Handler h) {
+			this.handler = h;
+		}
 
+		@Override
+		public void run() {
+			for (int i = 30; i > 0; i--) { 
+				Message msg = handler.obtainMessage();
+				msg.what = ProfileUtil.MSG_SMSCODE_WAITTING;
+	            handler.sendMessage(msg);  
+                if (i <= 0) {  
+                    break;  
+                }  
+                try {  
+                    Thread.sleep(1000);  
+                } catch (InterruptedException e) {  
+                    e.printStackTrace();  
+                }  
+            }
+			Message msg = handler.obtainMessage();
+			msg.what = ProfileUtil.MSG_SMSCODE_TIMEOUT;
+            handler.sendMessage(msg);
+            
+		}//end of run
+	}
+	
 	private void registerNodejsServer() {
 			String[] s = new String[4];		
 			try {
@@ -148,11 +209,11 @@ public class RegisterActivity extends Activity implements OnClickListener{
 	//http://blog.csdn.net/wuleihenbang/article/details/17126371
 	//http://blog.csdn.net/aigochina/article/details/17841999
 	private static class MyHandler extends Handler {  
-        private final RegisterActivity mActivity;  
+        private final RegisterActivitySMS mActivity;  
   
-        public MyHandler(Looper looper, RegisterActivity activity) {
+        public MyHandler(Looper looper, RegisterActivitySMS activity) {
         	super(looper);
-            mActivity = new WeakReference<RegisterActivity>(activity).get();  
+            mActivity = new WeakReference<RegisterActivitySMS>(activity).get();  
         }  
         
         @Override  
@@ -165,7 +226,35 @@ public class RegisterActivity extends Activity implements OnClickListener{
 				Toast.makeText(mActivity.getApplicationContext(), val, Toast.LENGTH_LONG).show();
 				mActivity.finish();
 				break;
-        	
+        	case ProfileUtil.MSG_SMSCODE:
+        		int event = msg.arg1;    
+                int result = msg.arg2;    
+                Object data = msg.obj;    
+                   
+                if (result == SMSSDK.RESULT_COMPLETE) {    
+                    // 短信注册成功后，返回MainActivity,然后提示    
+                    if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {// 提交验证码成功    
+                        Toast.makeText(mActivity.getApplicationContext(), "提交验证码成功",    
+                                Toast.LENGTH_SHORT).show(); 
+                        Intent intent = new Intent(mActivity.getApplicationContext(), 
+                        		MainActivity.class);    
+                        mActivity.startActivity(intent);
+                    }else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {    
+                        Toast.makeText(mActivity.getApplicationContext(), "正在获取验证码",    
+                                Toast.LENGTH_SHORT).show();    
+                    } else {    
+                        ((Throwable) data).printStackTrace();    
+                    }  
+                }
+        		break;
+        	case ProfileUtil.MSG_SMSCODE_WAITTING:    
+        		mActivity.requestCodeBtn.setText("重新发送(" + mActivity.i + ")"); 
+                break;
+        	case ProfileUtil.MSG_SMSCODE_TIMEOUT:  
+        		mActivity.requestCodeBtn.setText("获取验证码");    
+        		mActivity.requestCodeBtn.setClickable(true);    
+        		mActivity.i = 30;
+                break;
             
         	}
         }  
@@ -177,33 +266,6 @@ public class RegisterActivity extends Activity implements OnClickListener{
 	/**
 	 * 初始化短信SDK
 	 */
-	private class SendSMSThread implements Runnable {
-		Handler handler;
-		public SendSMSThread(Handler h) {
-			this.handler = h;
-		}
-
-		@Override
-		public void run() {
-			for (int i = 30; i > 0; i--) { 
-				Message msg = handler.obtainMessage();
-				msg.what = ProfileUtil.MSG_SMSCODE_WAITTING;
-	            handler.sendMessage(msg);  
-                if (i <= 0) {  
-                    break;  
-                }  
-                try {  
-                    Thread.sleep(1000);  
-                } catch (InterruptedException e) {  
-                    e.printStackTrace();  
-                }  
-            }
-			Message msg = handler.obtainMessage();
-			msg.what = ProfileUtil.MSG_SMSCODE_TIMEOUT;
-            handler.sendMessage(msg);
-            
-		}//end of run
-	}
 	 EventHandler eh = new EventHandler() {
 	        @Override
 	        public void afterEvent(int event, int result, Object data) {
@@ -289,7 +351,7 @@ public class RegisterActivity extends Activity implements OnClickListener{
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(RegisterActivity.this, str, Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivitySMS.this, str, Toast.LENGTH_SHORT).show();
             }
         });
     }

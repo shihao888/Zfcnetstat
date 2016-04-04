@@ -72,7 +72,10 @@ public class MainActivity extends Activity implements OnClickListener{
 
 	@Override
 	protected void onStart() {
-		
+		// 这一句不能省
+		// 在重写 onStart()、onStop()、onResume()、onPause()、onDestroy() 等等函数的时候
+		// 一定要在函数中加上一句 super.onXX();否则就会报错。
+		super.onStart();
 		// 如果曾经成功登录过,2分钟内不用再次登录，而显示直接跳转按钮
 		buttonShortcut = (Button) findViewById(R.id.buttonShortcut);
 		if (isAlreadyLoggedIn()) {
@@ -80,10 +83,7 @@ public class MainActivity extends Activity implements OnClickListener{
 			buttonShortcut.setOnClickListener(this);
 		} else
 			buttonShortcut.setVisibility(View.GONE);// 隐藏按钮
-		//这一句不能省
-		//在重写 onStart()、onStop()、onResume()、onPause()、onDestroy() 等等函数的时候
-		//一定要在函数中加上一句 super.onXX();否则就会报错。
-		super.onStart();
+		
 	}
 	
 	private Boolean isAlreadyLoggedIn() {
@@ -326,7 +326,7 @@ public class MainActivity extends Activity implements OnClickListener{
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								finish();
+								dialog.dismiss();
 							}
 
 						})
@@ -362,7 +362,8 @@ public class MainActivity extends Activity implements OnClickListener{
 				.setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						//点击"取消"按钮之后退出程序
-						finish();
+						//finish();
+						dialog.dismiss();
 					}
 				}).create();
 		dialog.show();

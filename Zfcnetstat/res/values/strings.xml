@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-	<string name="app_versionName">Z9</string>
+	<string name="app_versionName">Z11</string>
     <string name="app_name">上网时长统计</string>
     <string name="app_english_name">zfcnetstat</string>
     <string name="hello_world">浙江金融职业学院上网时长调查，本程序将会在后台运行，不会传播您任何隐私信息。-- 程序由周宏敏、史浩QQ454759425共同策划开发。</string>

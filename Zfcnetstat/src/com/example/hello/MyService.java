@@ -92,9 +92,12 @@ public class MyService extends Service {
 							if(task==null){
 								task = new MyTimerTask();
 							}
-							//Timer和TimerTask在调用cancel()取消后不能再执行 schedule语句，否则提示出错
-							timer.schedule(task, 1000, 60000); // 1s后执行task,然后每隔60s连续执行 
-							
+							try{
+								//Timer和TimerTask在调用cancel()取消后不能再执行 schedule语句，否则提示出错
+								timer.schedule(task, 1000, 60000); // 1s后执行task,然后每隔60s连续执行 
+							}catch(Exception e){
+								return;
+							}
 						}
 					}
 					else{

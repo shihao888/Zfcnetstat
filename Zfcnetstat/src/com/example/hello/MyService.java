@@ -93,7 +93,13 @@ public class MyService extends Service {
 								task = new MyTimerTask();
 							}
 							//Timer和TimerTask在调用cancel()取消后不能再执行 schedule语句，否则提示出错
+							try{
 							timer.schedule(task, 1000, 60000); // 1s后执行task,然后每隔60s连续执行 
+							}catch(Exception e){
+								//网络从wifi切换到mobile或者反之，都会导致定时器问题，这里只是简单返回
+								//可以进行真机调试
+								return;
+							}
 							
 						}
 					}

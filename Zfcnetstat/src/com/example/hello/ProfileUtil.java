@@ -1,6 +1,7 @@
 package com.example.hello;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Service;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -186,5 +187,13 @@ public class ProfileUtil {
     		Toast.makeText(mysrv.getApplicationContext(), s, Toast.LENGTH_LONG).show();
     		
 	}
-  
+    public static void toast(final Activity act, final String str) {
+       //Context c = context.getApplicationContext();
+       act.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(act, str, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }

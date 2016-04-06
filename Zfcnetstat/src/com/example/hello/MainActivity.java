@@ -4,11 +4,16 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
+import java.util.Calendar;
+import java.util.TimeZone;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -66,7 +72,7 @@ public class MainActivity extends Activity implements OnClickListener{
         
         //检查是否有版本更新
         checkNewVersion();
-
+        //checkNewVersionDaily();
 	}
 	
 
@@ -272,7 +278,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	private int newVerCode = 0;
 	private String newVerName = "";	
 	
-	private void checkNewVersion() {
+	public void checkNewVersion() {
 		
 		// 启动线程获取版本信息ver.json
 		Handler h = new MyHandler(this);
@@ -384,6 +390,54 @@ public class MainActivity extends Activity implements OnClickListener{
 				"application/vnd.android.package-archive");
 		startActivity(intent);
 	}
+	/*
+	 * 启动定时器，每天检查一次更新
+	 */
+	private void checkNewVersionDaily(){
+		
+		final long DAY = 1000L * 60 * 60 * 24;
+		
+		long firstTime = SystemClock.elapsedRealtime(); // 开机之后到现在的运行时间(包括睡眠时间)  
+		long currTime = System.currentTimeMillis();  
+		  
+		Calendar calendar = Calendar.getInstance();  
+		calendar.setTimeInMillis(System.currentTimeMillis());  
+		// 这里时区需要设置一下，不然会有8个小时的时间差  
+		calendar.setTimeZone(TimeZone.getTimeZone("GMT+8"));  
+		calendar.set(Calendar.MINUTE, 0);  
+		calendar.set(Calendar.HOUR_OF_DAY, 13); //24小时表示，13表示下午1点 
+		calendar.set(Calendar.SECOND, 0);  
+		calendar.set(Calendar.MILLISECOND, 0);
+		// 选择的每天定时时间  
+		long selectTime = calendar.getTimeInMillis();  
+		// 如果当前时间大于设置的时间，那么就从第二天的设定时间开始  
+		if(currTime > selectTime) {		  
+			calendar.add(Calendar.DAY_OF_MONTH, 1);  
+			selectTime = calendar.getTimeInMillis();  
+		}  
+		// 计算现在时间到设定时间的时间差
+	 	long time = selectTime - currTime;
+ 		firstTime += time;
+ 		
 
+		//这里采用定时发送广播的形式PendingIntent.getBroadcast
+		Intent intent = new Intent(MainActivity.this, ChkNewVersionReceiver.class);  
+		PendingIntent sender = PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
+	
+		// 进行闹铃注册
+        AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        firstTime, 10*1000, sender); 
+	}
+	// 取消检查新版本
+	public void cancelChkNewVersion(){		
+		Intent intent = new Intent(MainActivity.this, ChkNewVersionReceiver.class);
+        PendingIntent sender = PendingIntent.getBroadcast(MainActivity.this,
+                0, intent, 0);        
+        
+        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+        am.cancel(sender);
+
+	}
 	
 }

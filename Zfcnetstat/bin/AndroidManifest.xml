@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.hello"
-    android:versionCode="9"
+    android:versionCode="10"
     android:versionName="@string/app_versionName" >
 
     <uses-sdk
@@ -41,7 +41,7 @@
         <service android:enabled="true" android:name=".MyService"/>
         
         <service android:enabled="true" android:name=".UpdateService"/>
-
+		<receiver android:name=".ChkNewVersionReceiver" android:process=":remote" />
 		<activity
 		    android:name="cn.smssdk.SMSSDKUIShell"
 		    android:configChanges="keyboardHidden|orientation|screenSize"

@@ -28,6 +28,7 @@ public class ProfileUtil {
 	public static final int MSG_SMSCODE = 204;		//短信验证码
 	public static final int MSG_SMSCODE_WAITTING = 205;		//短信验证码
 	public static final int MSG_SMSCODE_TIMEOUT = 206;		//短信验证码
+	public static final int MSG_ALARM_CLOCK = 207;		//定时器消息
 	
 	public static final String mywebsite = "http://zfcnetstat.duapp.com";
 	public static final String LoginSuccessFlag = "OK"; //登录成功服务器返回的状态标记

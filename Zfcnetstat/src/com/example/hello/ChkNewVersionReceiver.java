@@ -3,6 +3,8 @@ package com.example.hello;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 /**
  * 
  * @ClassName: ChkNewVersionReceiver  
@@ -14,14 +16,20 @@ import android.content.Intent;
 
 public class ChkNewVersionReceiver extends BroadcastReceiver {
 	
+	public static com.example.hello.MainActivity.MyHandler handler;
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		
-		// 启动一个Activity       
-        Intent activityIntent = new Intent(context, MainActivity.class);    
-        //  要想在Service中启动Activity，必须设置如下标志（网上搜的才知道这点）    
-        activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);    
-        context.startActivity(activityIntent);  
+//		// 启动一个Activity       
+//        Intent activityIntent = new Intent(context, MainActivity.class);    
+//        //  要想在Service中启动Activity，必须设置如下标志（网上搜的才知道这点）    
+//        activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);    
+//        context.startActivity(activityIntent);
+		
+		Message msg = handler.obtainMessage();
+		msg.what = ProfileUtil.MSG_ALARM_CLOCK;
+		handler.sendMessage(msg);
 	}
 
 }

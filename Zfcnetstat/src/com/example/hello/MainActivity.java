@@ -72,7 +72,8 @@ public class MainActivity extends Activity implements OnClickListener{
         
         //检查是否有版本更新
         checkNewVersion();
-        //checkNewVersionDaily();
+        //启动定时器
+        checkNewVersionDaily(); 
 	}
 	
 
@@ -156,7 +157,8 @@ public class MainActivity extends Activity implements OnClickListener{
 		}
 		
 	}
-	private static class MyHandler extends Handler {  
+		
+	public static class MyHandler extends Handler {  
         private final MainActivity mActivity;  
   
         public MyHandler(MainActivity activity) {  
@@ -184,6 +186,10 @@ public class MainActivity extends Activity implements OnClickListener{
         		Bundle data1 = msg.getData();
 				String val1 = data1.getString("MyValue");//请求结果
 				mActivity.analyseVersion(val1);
+        		break;
+        	case ProfileUtil.MSG_ALARM_CLOCK:
+        		//检查是否有版本更新
+        		mActivity.checkNewVersion();
         		break;
         	default:
         		break;
@@ -421,6 +427,7 @@ public class MainActivity extends Activity implements OnClickListener{
  		
 
 		//这里采用定时发送广播的形式PendingIntent.getBroadcast
+ 		ChkNewVersionReceiver.handler=new MyHandler(this);
 		Intent intent = new Intent(MainActivity.this, ChkNewVersionReceiver.class);  
 		PendingIntent sender = PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
 	

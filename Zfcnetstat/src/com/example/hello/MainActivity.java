@@ -72,7 +72,10 @@ public class MainActivity extends Activity implements OnClickListener{
 
 	@Override
 	protected void onStart() {
-		
+		// 这一句不能省
+		// 在重写 onStart()、onStop()、onResume()、onPause()、onDestroy() 等等函数的时候
+		// 一定要在函数中加上一句 super.onXX();否则就会报错。
+		super.onStart();
 		// 如果曾经成功登录过,2分钟内不用再次登录，而显示直接跳转按钮
 		buttonShortcut = (Button) findViewById(R.id.buttonShortcut);
 		if (isAlreadyLoggedIn()) {
@@ -80,10 +83,7 @@ public class MainActivity extends Activity implements OnClickListener{
 			buttonShortcut.setOnClickListener(this);
 		} else
 			buttonShortcut.setVisibility(View.GONE);// 隐藏按钮
-		//这一句不能省
-		//在重写 onStart()、onStop()、onResume()、onPause()、onDestroy() 等等函数的时候
-		//一定要在函数中加上一句 super.onXX();否则就会报错。
-		super.onStart();
+		
 	}
 	
 	private Boolean isAlreadyLoggedIn() {
@@ -106,8 +106,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		// TODO Auto-generated method stub
 				
 		switch (src.getId()) {
-		case R.id.buttonlogin:
-			buttonLogin.setEnabled(false);    		
+		case R.id.buttonlogin:			    		
     		// 获取用户手机号  
             mobilenum = et_mobilenum.getText().toString();  
             // 获取用户密码
@@ -116,6 +115,7 @@ public class MainActivity extends Activity implements OnClickListener{
                 Toast.makeText(this, "手机号和密码都不能为空,调查服务没有启动！", Toast.LENGTH_LONG).show();
                 return;
             }else{
+            	buttonLogin.setEnabled(false);
             	login(mobilenum,pwd);       	
             }                       
 			break;
@@ -251,9 +251,19 @@ public class MainActivity extends Activity implements OnClickListener{
 		 * 设置这两个flag，就是让一个且唯一的一个activity（服务界面）运行在最前端。
 		 */
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);//http://blog.csdn.net/sxsj333/article/details/6639812
-		FromAct.startActivity(intent);
+		FromAct.startActivityForResult(intent, 0);
 	}
-
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		switch (resultCode) { 
+		case RESULT_OK:
+			Bundle b=data.getExtras(); //data为B中回传的Intent
+			String str=b.getString("voice from RegisterActivity");
+			break;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 	/*
 	 * 检查是否为新版本
 	 */
@@ -316,7 +326,7 @@ public class MainActivity extends Activity implements OnClickListener{
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								finish();
+								dialog.dismiss();
 							}
 
 						})
@@ -352,7 +362,8 @@ public class MainActivity extends Activity implements OnClickListener{
 				.setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						//点击"取消"按钮之后退出程序
-						finish();
+						//finish();
+						dialog.dismiss();
 					}
 				}).create();
 		dialog.show();
@@ -373,4 +384,6 @@ public class MainActivity extends Activity implements OnClickListener{
 				"application/vnd.android.package-archive");
 		startActivity(intent);
 	}
+
+	
 }

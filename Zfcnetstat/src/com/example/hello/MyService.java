@@ -86,6 +86,7 @@ public class MyService extends Service {
 						Toast.makeText(getApplicationContext(), info.getTypeName(),Toast.LENGTH_SHORT).show();
 						//将之前的上网时间数值上传网站（在WIFI或者MOBILE情况下）
 						if(info.getType() == ConnectivityManager.TYPE_MOBILE||info.getType() == ConnectivityManager.TYPE_WIFI){
+							//TimerTask 是不能复用的， 要重新创建
 							if(timer==null){
 								timer = new Timer();
 							}
@@ -243,6 +244,7 @@ public class MyService extends Service {
 		}
 		if (timer != null) {
 			timer.cancel();
+			timer.purge();//从这个计时器的任务队列中移除所有已取消的任务
 			timer = null;
 		}
 	}
